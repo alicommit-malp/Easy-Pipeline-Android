@@ -1,5 +1,6 @@
 package com.appelinda.easypipeline;
 
 public interface IPipelineResult {
-    void OnResult(int sourcePipelineHashCode, IPipelineData pipelineData);
+
+    void OnResult(Integer pipelineRequestCode, IPipelineData pipelineData);
 }

@@ -5,12 +5,18 @@ import android.os.AsyncTask;
 public class Pipeline extends WorkStation {
 
     private IPipelineResult pipelineResult;
-    private int requestCode;
 
-    public Pipeline(IPipelineResult pipelineResult, int requestCode) {
+    public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode) {
         IsRoot = true;
-        this.requestCode = requestCode;
+        this.pipelineRequestCode = pipelineRequestCode;
         this.pipelineResult = pipelineResult;
+    }
+
+    public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode,IPipelineProgress iPipelineProgress) {
+        IsRoot = true;
+        this.pipelineRequestCode = pipelineRequestCode;
+        this.pipelineResult = pipelineResult;
+        this.iPipelineProgress = iPipelineProgress;
     }
 
     protected void InvokeAsync(IPipelineData iPipelineData) {
@@ -30,7 +36,7 @@ public class Pipeline extends WorkStation {
 
         @Override
         protected void onPostExecute(IPipelineData pipelineData) {
-            pipelineResult.OnResult(requestCode,pipelineData);
+            pipelineResult.OnResult(pipelineRequestCode,pipelineData);
         }
     }
 

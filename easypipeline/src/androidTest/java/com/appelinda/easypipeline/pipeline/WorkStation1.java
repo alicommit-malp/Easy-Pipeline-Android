@@ -13,10 +13,11 @@ public class WorkStation1 extends WorkStation {
 
         try {
             Thread.sleep(1000);
-            pipelineData.setW1(WorkStation1.class.getName());
+            pipelineData.AddResult(WorkStation1.class.getName());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
 
         super.InvokeAsync(data);
     }

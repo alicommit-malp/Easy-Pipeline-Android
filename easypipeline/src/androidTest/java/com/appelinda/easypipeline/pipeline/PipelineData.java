@@ -3,31 +3,17 @@ package com.appelinda.easypipeline.pipeline;
 
 import com.appelinda.easypipeline.IPipelineData;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PipelineData implements IPipelineData {
-    private String W1;
-    private String W2;
+    private List<String> result= new ArrayList<>();
 
-    public String getW1() {
-        return W1;
+    public List<String> getResult() {
+        return result;
     }
 
-    public void setW1(String w1) {
-        W1 = w1;
-    }
-
-    public String getW2() {
-        return W2;
-    }
-
-    public void setW2(String w2) {
-        W2 = w2;
-    }
-
-    @Override
-    public String toString() {
-        return "PipelineData{" +
-                "W1='" + W1 + '\'' +
-                ", W2='" + W2 + '\'' +
-                '}';
+    public void AddResult(String value) {
+        result.add(value);
     }
 }
