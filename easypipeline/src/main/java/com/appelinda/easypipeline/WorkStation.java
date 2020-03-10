@@ -2,7 +2,7 @@ package com.appelinda.easypipeline;
 
 /**
  * @author Ali Alp
- * @see  <a href="https://dev.to/alialp/asynchronous-easy-pipeline-in-android-h7p">Easy-Pipeline on Dev.to</a>
+ * @see <a href="https://dev.to/alialp/asynchronous-easy-pipeline-in-android-h7p">Easy-Pipeline on Dev.to</a>
  * Each step of the Pipeline (including the Pipeline class itself) must be inherited from
  * this class to be added as Next() method's parameter.
  */
@@ -15,6 +15,7 @@ public abstract class WorkStation {
     Integer pipelineRequestCode = null;
     Integer workStationRequestCode = null;
     Float progressValue = null;
+    boolean runOnUiThread = false;
 
     /**
      * Set the next WorkStation in the pipeline
@@ -31,10 +32,10 @@ public abstract class WorkStation {
     /**
      * Set the next WorkStation in the pipeline
      *
-     * @param workStation an instance of a concrete implementation of WorkStation abstract class
-     * @param _workStationRequestCode  a request code which must be unique in this pipeline,
-     *                                 Pipeline will notify the caller method's OnProgress() callback method providing
-     *                                 this request code to be able to determine which WorkStation has been done
+     * @param workStation             an instance of a concrete implementation of WorkStation abstract class
+     * @param _workStationRequestCode a request code which must be unique in this pipeline,
+     *                                Pipeline will notify the caller method's OnProgress() callback method providing
+     *                                this request code to be able to determine which WorkStation has been done
      * @return returning the same instance of the workStation for supporting builder pattern
      */
     public WorkStation Next(WorkStation workStation, Integer _workStationRequestCode) {
@@ -46,11 +47,11 @@ public abstract class WorkStation {
     /**
      * Set the next WorkStation in the pipeline
      *
-     * @param workStation an instance of a concrete implementation of WorkStation abstract class
-     * @param progress    the amount of the progress which is considered done when this WorkStation's job is done
-     * @param _workStationRequestCode  a request code which must be unique in this pipeline,
-     *                                 Pipeline will notify the caller method's OnProgress() callback method providing
-     *                                 this request code to be able to determine which WorkStation has been done
+     * @param workStation             an instance of a concrete implementation of WorkStation abstract class
+     * @param progress                the amount of the progress which is considered done when this WorkStation's job is done
+     * @param _workStationRequestCode a request code which must be unique in this pipeline,
+     *                                Pipeline will notify the caller method's OnProgress() callback method providing
+     *                                this request code to be able to determine which WorkStation has been done
      * @return returning the same instance of the workStation for supporting builder pattern
      */
     public WorkStation Next(WorkStation workStation, Float progress, Integer _workStationRequestCode) {
@@ -82,14 +83,14 @@ public abstract class WorkStation {
     }
 
     /**
-     * Begin the Pipeline by traversing from the first defined Workstation
+     * Asynchronously, Begin the Pipeline by traversing from the first defined Workstation
      *
      * @param data an instance of a concrete implementation of the IPipelineData class
      */
-    public void Run(IPipelineData data){
+    public void Run(IPipelineData data) {
         if (IsRoot) {
             try {
-                InvokeAsync(data);
+                Invoke(data);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -98,16 +99,37 @@ public abstract class WorkStation {
         }
     }
 
-    void updateProgress() {
-        if (iPipelineProgress == null)
-            throw new NullPointerException("You cannot provide progress value when calling the Next method and not provide the IPipelineProgress instance! ");
-        iPipelineProgress.OnProgress(pipelineRequestCode, workStationRequestCode, progressValue);
+    /**
+     * Synchronously, Begin the Pipeline by traversing from the first defined Workstation
+     *
+     * @param data an instance of a concrete implementation of the IPipelineData class
+     */
+    public PipelineResult RunOnUiThread(IPipelineData data) {
+        this.runOnUiThread = true;
+        PipelineResult pipelineResult = new PipelineResult(pipelineRequestCode);
+        if (IsRoot) {
+            try {
+                Invoke(data);
+            } catch (Exception e) {
+                pipelineResult.setException(e);
+            }
+        } else {
+            _prevWorkStation.RunOnUiThread(data);
+        }
+
+        pipelineResult.setPipelineData(data);
+        return pipelineResult;
     }
 
-    protected void InvokeAsync(IPipelineData data) throws Exception{
+    void updateProgress() {
+        if (iPipelineProgress != null)
+            iPipelineProgress.OnProgress(pipelineRequestCode, workStationRequestCode, progressValue);
+    }
+
+    protected void Invoke(IPipelineData data) throws Exception {
         if (progressValue != null || workStationRequestCode != null)
             updateProgress();
 
-        if (_nextWorkStation != null) _nextWorkStation.InvokeAsync(data);
+        if (_nextWorkStation != null) _nextWorkStation.Invoke(data);
     }
 }

@@ -1,10 +1,8 @@
 package com.appelinda.easypipeline;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.appelinda.easypipeline.pipeline.PipelineData;
 import com.appelinda.easypipeline.pipeline.WorkStation1;
@@ -17,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -25,22 +22,34 @@ import java.util.concurrent.TimeUnit;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(AndroidJUnit4.class)
-public class PipelineTest implements IPipelineResult, IPipelineProgress {
+public class PipelineTest implements IPipelineResult ,IPipelineProgress{
 
     PipelineData pipelineData;
     public static final int ReqCode = 1;
     private CountDownLatch lock = new CountDownLatch(1);
     PipelineData pipelineResult;
 
-
     @Test
-    public void useAppContext() throws InterruptedException {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+    public void SyncTest() throws InterruptedException {
 
         pipelineData = new PipelineData();
 
-        new Pipeline(this, ReqCode, this)
+        PipelineResult result = new Pipeline(this, ReqCode)
+                .Next(new WorkStation1(), 20F, 11)
+                .Next(new WorkStation2())
+                .Next(new WorkStation3(), 12)
+                .Next(new WorkStation4(), 100F)
+                .RunOnUiThread(pipelineData);
+
+        Assert.assertEquals(pipelineData, result.getPipelineData());
+    }
+
+    @Test
+    public void AsyncTest() throws InterruptedException {
+
+        pipelineData = new PipelineData();
+
+        new Pipeline(this, ReqCode)
                 .Next(new WorkStation1(), 20F, 11)
                 .Next(new WorkStation2())
                 .Next(new WorkStation3(), 12)
@@ -49,7 +58,7 @@ public class PipelineTest implements IPipelineResult, IPipelineProgress {
 
         lock.await();
 
-        Assert.assertEquals(pipelineData,pipelineResult);
+        Assert.assertEquals(pipelineData, pipelineResult);
     }
 
     @Override
@@ -61,8 +70,8 @@ public class PipelineTest implements IPipelineResult, IPipelineProgress {
                     pipelineResult = (PipelineData) result.getPipelineData();
                     break;
             }
-        }else {
-           result.getException().printStackTrace();
+        } else {
+            result.getException().printStackTrace();
         }
 
         lock.countDown();
