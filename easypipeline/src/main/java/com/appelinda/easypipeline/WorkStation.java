@@ -2,7 +2,7 @@ package com.appelinda.easypipeline;
 
 /**
  * @author Ali Alp
- * @see {@link "https://dev.to/alialp/asynchronous-easy-pipeline-in-android-h7p"}
+ * @see  <a href="https://dev.to/alialp/asynchronous-easy-pipeline-in-android-h7p">Easy-Pipeline on Dev.to</a>
  * Each step of the Pipeline (including the Pipeline class itself) must be inherited from
  * this class to be added as Next() method's parameter.
  */
@@ -21,7 +21,7 @@ public abstract class WorkStation {
      *
      * @param workStation an instance of a concrete implementation of WorkStation abstract class
      * @param progress    the amount of the progress which is considered done when this WorkStation's job is done
-     * @return returning the same instance of the {@param workStation} for supporting builder pattern
+     * @return returning the same instance of the workStation for supporting builder patternA
      */
     public WorkStation Next(WorkStation workStation, Float progress) {
         progressValue = progress;
@@ -35,7 +35,7 @@ public abstract class WorkStation {
      * @param _workStationRequestCode  a request code which must be unique in this pipeline,
      *                                 Pipeline will notify the caller method's OnProgress() callback method providing
      *                                 this request code to be able to determine which WorkStation has been done
-     * @return returning the same instance of the {@param workStation} for supporting builder pattern
+     * @return returning the same instance of the workStation for supporting builder pattern
      */
     public WorkStation Next(WorkStation workStation, Integer _workStationRequestCode) {
         workStationRequestCode = _workStationRequestCode;
@@ -51,7 +51,7 @@ public abstract class WorkStation {
      * @param _workStationRequestCode  a request code which must be unique in this pipeline,
      *                                 Pipeline will notify the caller method's OnProgress() callback method providing
      *                                 this request code to be able to determine which WorkStation has been done
-     * @return returning the same instance of the {@param workStation} for supporting builder pattern
+     * @return returning the same instance of the workStation for supporting builder pattern
      */
     public WorkStation Next(WorkStation workStation, Float progress, Integer _workStationRequestCode) {
         progressValue = progress;
@@ -65,7 +65,7 @@ public abstract class WorkStation {
      * Set the next WorkStation in the pipeline
      *
      * @param workStation an instance of a concrete implementation of WorkStation abstract class
-     * @return returning the same instance of the {@param workStation} for supporting builder pattern
+     * @return returning the same instance of the workStation for supporting builder pattern
      */
     public WorkStation Next(WorkStation workStation) {
         return _Next(workStation);
