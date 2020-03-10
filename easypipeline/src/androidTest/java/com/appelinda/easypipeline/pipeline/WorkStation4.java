@@ -7,16 +7,12 @@ import com.appelinda.easypipeline.WorkStation;
 public class WorkStation4 extends WorkStation {
 
     @Override
-    protected void InvokeAsync(IPipelineData data) {
+    protected void InvokeAsync(IPipelineData data) throws Exception {
 
         PipelineData pipelineData = (PipelineData) data;
 
-        try {
-            Thread.sleep(1000);
-            pipelineData.AddResult(WorkStation4.class.getName());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(1000);
+        pipelineData.AddResult(WorkStation4.class.getName());
 
         super.InvokeAsync(data);
     }

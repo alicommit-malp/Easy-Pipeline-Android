@@ -16,4 +16,11 @@ public class PipelineData implements IPipelineData {
     public void AddResult(String value) {
         result.add(value);
     }
+
+    @Override
+    public String toString() {
+        return "PipelineData{" +
+                "result=" + result +
+                '}';
+    }
 }

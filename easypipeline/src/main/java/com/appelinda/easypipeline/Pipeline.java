@@ -4,53 +4,63 @@ import android.os.AsyncTask;
 
 public class Pipeline extends WorkStation {
 
-    private IPipelineResult pipelineResult;
+    private IPipelineResult pipelineResultCallback;
+    private IPipelineData pipelineData;
 
     /**
      * Will instantiate a new Pipeline
      *
-     * @param pipelineResult      An instance reference to the IPipelineResult concrete implementation
+     * @param pipelineResultCallback      An instance reference to the IPipelineResult concrete implementation
      * @param pipelineRequestCode An unique request code belong to this pipeline
      */
-    public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode) {
+    public Pipeline(IPipelineResult pipelineResultCallback, Integer pipelineRequestCode) {
         IsRoot = true;
         this.pipelineRequestCode = pipelineRequestCode;
-        this.pipelineResult = pipelineResult;
+        this.pipelineResultCallback = pipelineResultCallback;
     }
 
     /**
      * Will instantiate a new Pipeline
      *
-     * @param pipelineResult      An instance reference to the IPipelineResult concrete implementation
+     * @param pipelineResultCallback      An instance reference to the IPipelineResult concrete implementation
      * @param pipelineRequestCode An unique request code belong to this pipeline
      * @param iPipelineProgress   An instance reference to the IPipelineProgress concrete implantation
      */
-    public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode, IPipelineProgress iPipelineProgress) {
+    public Pipeline(IPipelineResult pipelineResultCallback, Integer pipelineRequestCode, IPipelineProgress iPipelineProgress) {
         IsRoot = true;
         this.pipelineRequestCode = pipelineRequestCode;
-        this.pipelineResult = pipelineResult;
+        this.pipelineResultCallback = pipelineResultCallback;
         this.iPipelineProgress = iPipelineProgress;
     }
 
-    protected void InvokeAsync(IPipelineData iPipelineData) {
-        new runInBackground().execute(iPipelineData);
+    protected void InvokeAsync(IPipelineData pipelineData) {
+        this.pipelineData = pipelineData;
+        new PipelineWorker().execute(this);
     }
 
-    void invokeAsync(IPipelineData iPipelineData) {
+    private void invokeAsync(IPipelineData iPipelineData) throws Exception {
         super.InvokeAsync(iPipelineData);
     }
 
-    class runInBackground extends AsyncTask<IPipelineData, Void, IPipelineData> {
+    static class PipelineWorker extends AsyncTask<Pipeline, Void, Pipeline> {
+        PipelineResult pipelineResult;
+
         @Override
-        protected IPipelineData doInBackground(IPipelineData... iPipelineData) {
-            invokeAsync(iPipelineData[0]);
-            return iPipelineData[0];
+        protected Pipeline doInBackground(Pipeline... pipelines) {
+            pipelineResult= new PipelineResult(pipelines[0].pipelineRequestCode);
+            try {
+                pipelines[0].invokeAsync(pipelines[0].pipelineData);
+            } catch (Exception e) {
+                pipelineResult.setException(e);
+            } finally {
+                pipelineResult.setPipelineData(pipelines[0].pipelineData);
+            }
+            return pipelines[0];
         }
 
         @Override
-        protected void onPostExecute(IPipelineData pipelineData) {
-            pipelineResult.OnResult(pipelineRequestCode, pipelineData);
+        protected void onPostExecute(Pipeline pipeline) {
+            pipeline.pipelineResultCallback.OnResult(pipelineResult);
         }
     }
-
 }

@@ -50,7 +50,7 @@ A step in a pipeline, in the above example Call_API_A() is a workstation
 public class Call_API_A extends WorkStation {
 
     @Override
-    protected void InvokeAsync(IPipelineData data) {
+    protected void InvokeAsync(IPipelineData data) throws Exception {
 
         PipelineData pipelineData = (PipelineData) data;
 
@@ -72,42 +72,57 @@ is an integer which you need to provide the pipeline with, to be able to handle 
 
 ```java
 
-
 @RunWith(AndroidJUnit4.class)
-public class PipelineTest implements IPipelineResult,IPipelineProgress {
+public class PipelineTest implements IPipelineResult, IPipelineProgress {
 
     PipelineData pipelineData;
     public static final int ReqCode = 1;
+    private CountDownLatch lock = new CountDownLatch(1);
+    PipelineData pipelineResult;
+
 
     @Test
-    public void test() {
-        pipelineData  = new PipelineData();
+    public void useAppContext() throws InterruptedException {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        new Pipeline(this,ReqCode,this)
-                .Next(new Call_API_A(),25F)
-                .Next(new Save_To_Local_DB(),50F)
-                .Next(new Notify_The_UI(),75F)
-                .Next(new Send_Statistics(),100F)
+        pipelineData = new PipelineData();
+
+        new Pipeline(this, ReqCode, this)
+                .Next(new WorkStation1(), 20F, 11)
+                .Next(new WorkStation2())
+                .Next(new WorkStation3(), 12)
+                .Next(new WorkStation4(), 100F)
                 .Run(pipelineData);
 
+        lock.await();
+
+        Assert.assertEquals(pipelineData,pipelineResult);
     }
 
     @Override
-    public void OnResult(Integer pipelineRequestCode, IPipelineData pipelineData) {
-       switch (pipelineRequestCode){
-           case ReqCode:
-               PipelineData data = (PipelineData) pipelineData;
-               Log.d("REQ-" + ReqCode , data.toString());
-               break;
-       }
+    public void OnResult(PipelineResult result) {
+        if (result.isSuccess()) {
+            switch (result.getRequestCode()) {
+                case ReqCode:
+                    Log.d("REQ-" + ReqCode, result.getPipelineData().toString());
+                    pipelineResult = (PipelineData) result.getPipelineData();
+                    break;
+            }
+        }else {
+           result.getException().printStackTrace();
+        }
+
+        lock.countDown();
     }
 
 
     @Override
     public void OnProgress(Integer sourcePipelineHashCode, Integer workStationRequestCode, Float progress) {
-        Log.d("REQ-" + sourcePipelineHashCode , " WorkStationReqCode: " + workStationRequestCode + " progress: " + progress);
+        Log.d("REQ-" + sourcePipelineHashCode, " WorkStationReqCode: " + workStationRequestCode + " progress: " + progress);
     }
 }
+
 
 ```
 

@@ -86,9 +86,13 @@ public abstract class WorkStation {
      *
      * @param data an instance of a concrete implementation of the IPipelineData class
      */
-    public void Run(IPipelineData data) {
+    public void Run(IPipelineData data){
         if (IsRoot) {
-            InvokeAsync(data);
+            try {
+                InvokeAsync(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
             _prevWorkStation.Run(data);
         }
@@ -100,7 +104,7 @@ public abstract class WorkStation {
         iPipelineProgress.OnProgress(pipelineRequestCode, workStationRequestCode, progressValue);
     }
 
-    protected void InvokeAsync(IPipelineData data) {
+    protected void InvokeAsync(IPipelineData data) throws Exception{
         if (progressValue != null || workStationRequestCode != null)
             updateProgress();
 
