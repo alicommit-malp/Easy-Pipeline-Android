@@ -6,13 +6,26 @@ public class Pipeline extends WorkStation {
 
     private IPipelineResult pipelineResult;
 
+    /**
+     * Will instantiate a new Pipeline
+     *
+     * @param pipelineResult      An instance reference to the IPipelineResult concrete implementation
+     * @param pipelineRequestCode An unique request code belong to this pipeline
+     */
     public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode) {
         IsRoot = true;
         this.pipelineRequestCode = pipelineRequestCode;
         this.pipelineResult = pipelineResult;
     }
 
-    public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode,IPipelineProgress iPipelineProgress) {
+    /**
+     * Will instantiate a new Pipeline
+     *
+     * @param pipelineResult      An instance reference to the IPipelineResult concrete implementation
+     * @param pipelineRequestCode An unique request code belong to this pipeline
+     * @param iPipelineProgress   An instance reference to the IPipelineProgress concrete implantation
+     */
+    public Pipeline(IPipelineResult pipelineResult, Integer pipelineRequestCode, IPipelineProgress iPipelineProgress) {
         IsRoot = true;
         this.pipelineRequestCode = pipelineRequestCode;
         this.pipelineResult = pipelineResult;
@@ -23,11 +36,11 @@ public class Pipeline extends WorkStation {
         new runInBackground().execute(iPipelineData);
     }
 
-    private void invokeAsync(IPipelineData iPipelineData){
+    void invokeAsync(IPipelineData iPipelineData) {
         super.InvokeAsync(iPipelineData);
     }
 
-    private class runInBackground extends AsyncTask<IPipelineData, Void, IPipelineData> {
+    class runInBackground extends AsyncTask<IPipelineData, Void, IPipelineData> {
         @Override
         protected IPipelineData doInBackground(IPipelineData... iPipelineData) {
             invokeAsync(iPipelineData[0]);
@@ -36,7 +49,7 @@ public class Pipeline extends WorkStation {
 
         @Override
         protected void onPostExecute(IPipelineData pipelineData) {
-            pipelineResult.OnResult(pipelineRequestCode,pipelineData);
+            pipelineResult.OnResult(pipelineRequestCode, pipelineData);
         }
     }
 
