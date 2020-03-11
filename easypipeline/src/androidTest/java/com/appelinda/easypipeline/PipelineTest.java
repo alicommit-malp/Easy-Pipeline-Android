@@ -24,13 +24,13 @@ import java.util.concurrent.CountDownLatch;
 @RunWith(AndroidJUnit4.class)
 public class PipelineTest implements IPipelineResult ,IPipelineProgress{
 
-    PipelineData pipelineData;
-    public static final int ReqCode = 1;
+    private PipelineData pipelineData;
+    private static final int ReqCode = 1;
     private CountDownLatch lock = new CountDownLatch(1);
-    PipelineData pipelineResult;
+    private PipelineData pipelineResult;
 
     @Test
-    public void SyncTest() throws InterruptedException {
+    public void SyncTest() {
 
         pipelineData = new PipelineData();
 
@@ -64,11 +64,9 @@ public class PipelineTest implements IPipelineResult ,IPipelineProgress{
     @Override
     public void OnResult(PipelineResult result) {
         if (result.isSuccess()) {
-            switch (result.getRequestCode()) {
-                case ReqCode:
-                    Log.d("REQ-" + ReqCode, result.getPipelineData().toString());
-                    pipelineResult = (PipelineData) result.getPipelineData();
-                    break;
+            if (result.getRequestCode() == ReqCode) {
+                Log.d("REQ-" + ReqCode, result.getPipelineData().toString());
+                pipelineResult = (PipelineData) result.getPipelineData();
             }
         } else {
             result.getException().printStackTrace();
