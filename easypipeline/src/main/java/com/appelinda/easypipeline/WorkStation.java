@@ -24,7 +24,7 @@ public abstract class WorkStation {
      * @param progress    the amount of the progress which is considered done when this WorkStation's job is done
      * @return returning the same instance of the workStation for supporting builder patternA
      */
-    public WorkStation Next(WorkStation workStation, Float progress) {
+    public WorkStation next(WorkStation workStation, Float progress) {
         progressValue = progress;
         return _Next(workStation);
     }
@@ -38,7 +38,7 @@ public abstract class WorkStation {
      *                                this request code to be able to determine which WorkStation has been done
      * @return returning the same instance of the workStation for supporting builder pattern
      */
-    public WorkStation Next(WorkStation workStation, Integer _workStationRequestCode) {
+    public WorkStation next(WorkStation workStation, Integer _workStationRequestCode) {
         workStationRequestCode = _workStationRequestCode;
 
         return _Next(workStation);
@@ -54,7 +54,7 @@ public abstract class WorkStation {
      *                                this request code to be able to determine which WorkStation has been done
      * @return returning the same instance of the workStation for supporting builder pattern
      */
-    public WorkStation Next(WorkStation workStation, Float progress, Integer _workStationRequestCode) {
+    public WorkStation next(WorkStation workStation, Float progress, Integer _workStationRequestCode) {
         progressValue = progress;
         workStationRequestCode = _workStationRequestCode;
 
@@ -68,7 +68,7 @@ public abstract class WorkStation {
      * @param workStation an instance of a concrete implementation of WorkStation abstract class
      * @return returning the same instance of the workStation for supporting builder pattern
      */
-    public WorkStation Next(WorkStation workStation) {
+    public WorkStation next(WorkStation workStation) {
         return _Next(workStation);
     }
 
@@ -87,15 +87,15 @@ public abstract class WorkStation {
      *
      * @param data an instance of a concrete implementation of the IPipelineData class
      */
-    public void Run(IPipelineData data) {
+    public void runAsync(IPipelineData data) {
         if (IsRoot) {
             try {
-                Invoke(data);
+                invoke(data);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            _prevWorkStation.Run(data);
+            _prevWorkStation.runAsync(data);
         }
     }
 
@@ -104,21 +104,15 @@ public abstract class WorkStation {
      *
      * @param data an instance of a concrete implementation of the IPipelineData class
      */
-    public PipelineResult RunOnUiThread(IPipelineData data) {
+    public IPipelineData runOnUiThread(IPipelineData data) throws Exception {
         this.runOnUiThread = true;
-        PipelineResult pipelineResult = new PipelineResult(pipelineRequestCode);
         if (IsRoot) {
-            try {
-                Invoke(data);
-            } catch (Exception e) {
-                pipelineResult.setException(e);
-            }
+            invoke(data);
         } else {
-            _prevWorkStation.RunOnUiThread(data);
+            _prevWorkStation.runOnUiThread(data);
         }
 
-        pipelineResult.setPipelineData(data);
-        return pipelineResult;
+        return data;
     }
 
     void updateProgress() {
@@ -126,10 +120,10 @@ public abstract class WorkStation {
             iPipelineProgress.OnProgress(pipelineRequestCode, workStationRequestCode, progressValue);
     }
 
-    protected void Invoke(IPipelineData data) throws Exception {
+    protected void invoke(IPipelineData data) throws Exception {
         if (progressValue != null || workStationRequestCode != null)
             updateProgress();
 
-        if (_nextWorkStation != null) _nextWorkStation.Invoke(data);
+        if (_nextWorkStation != null) _nextWorkStation.invoke(data);
     }
 }

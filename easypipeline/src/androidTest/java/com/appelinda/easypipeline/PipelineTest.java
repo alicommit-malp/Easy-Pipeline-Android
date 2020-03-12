@@ -26,22 +26,22 @@ public class PipelineTest implements IPipelineResult ,IPipelineProgress{
 
     PipelineData pipelineData;
     public static final int ReqCode = 1;
-    private CountDownLatch lock = new CountDownLatch(1);
+    private CountDownLatch countDownLatch = new CountDownLatch(1);
     PipelineData pipelineResult;
 
     @Test
-    public void SyncTest() throws InterruptedException {
+    public void SyncTest() throws Exception {
 
         pipelineData = new PipelineData();
 
-        PipelineResult result = new Pipeline(this, ReqCode)
-                .Next(new WorkStation1(), 20F, 11)
-                .Next(new WorkStation2())
-                .Next(new WorkStation3(), 12)
-                .Next(new WorkStation4(), 100F)
-                .RunOnUiThread(pipelineData);
+        PipelineData result = (PipelineData) new Pipeline()
+                .next(new WorkStation1(), 20F, 11)
+                .next(new WorkStation2())
+                .next(new WorkStation3(), 12)
+                .next(new WorkStation4(), 100F)
+                .runOnUiThread(pipelineData);
 
-        Assert.assertEquals(pipelineData, result.getPipelineData());
+        Assert.assertEquals(pipelineData, result);
     }
 
     @Test
@@ -49,14 +49,14 @@ public class PipelineTest implements IPipelineResult ,IPipelineProgress{
 
         pipelineData = new PipelineData();
 
-        new Pipeline(this, ReqCode)
-                .Next(new WorkStation1(), 20F, 11)
-                .Next(new WorkStation2())
-                .Next(new WorkStation3(), 12)
-                .Next(new WorkStation4(), 100F)
-                .Run(pipelineData);
+        new Pipeline(this,ReqCode)
+                .next(new WorkStation1(), 20F, 11)
+                .next(new WorkStation2())
+                .next(new WorkStation3(), 12)
+                .next(new WorkStation4(), 100F)
+                .runAsync(pipelineData);
 
-        lock.await();
+        countDownLatch.await();
 
         Assert.assertEquals(pipelineData, pipelineResult);
     }
@@ -74,7 +74,7 @@ public class PipelineTest implements IPipelineResult ,IPipelineProgress{
             result.getException().printStackTrace();
         }
 
-        lock.countDown();
+        countDownLatch.countDown();
     }
 
 
