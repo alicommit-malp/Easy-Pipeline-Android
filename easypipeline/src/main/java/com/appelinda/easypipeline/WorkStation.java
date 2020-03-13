@@ -17,6 +17,8 @@ public abstract class WorkStation {
     Float progressValue = null;
     IPipelineCallback pipelineCallback;
     IPipelineData pipelineData;
+    IPipelineResult pipelineResult;
+    long delayMillis=0;
     boolean runOnUiThread = false;
 
     /**
@@ -81,13 +83,13 @@ public abstract class WorkStation {
         _nextWorkStation.iPipelineProgress = iPipelineProgress;
         _nextWorkStation.pipelineRequestCode = pipelineRequestCode;
         _nextWorkStation.pipelineData = pipelineData;
+        _nextWorkStation.delayMillis = delayMillis;
 
         return _nextWorkStation;
     }
 
     /**
      * Asynchronously, Begin the Pipeline by traversing from the first defined Workstation
-     *
      */
     public void runAsync() {
         if (IsRoot) {
@@ -98,6 +100,80 @@ public abstract class WorkStation {
             }
         } else {
             _prevWorkStation.runAsync();
+        }
+    }
+
+    /**
+     * Asynchronously, Begin the Pipeline by traversing from the first defined Workstation
+     *
+     * @param pipelineCallback An instance(s) reference to the IPipelineResult or/and IPipelineProgress concrete implementation
+     */
+    public void runAsync(IPipelineCallback pipelineCallback) {
+        prepareAsync(pipelineCallback, pipelineRequestCode,delayMillis);
+
+        if (IsRoot) {
+            try {
+                invoke(pipelineData);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            _prevWorkStation.runAsync(pipelineCallback);
+        }
+    }
+
+    /**
+     * Asynchronously, Begin the Pipeline by traversing from the first defined Workstation
+     *
+     * @param pipelineCallback    An instance(s) reference to the IPipelineResult or/and IPipelineProgress concrete implementation
+     * @param pipelineRequestCode An unique request code belong to this pipeline
+     */
+    public void runAsync(IPipelineCallback pipelineCallback, Integer pipelineRequestCode) {
+        prepareAsync(pipelineCallback, pipelineRequestCode,delayMillis);
+
+        if (IsRoot) {
+            try {
+                invoke(pipelineData);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            _prevWorkStation.runAsync(pipelineCallback, pipelineRequestCode);
+        }
+    }
+
+
+
+    /**
+     * Asynchronously, Begin the Pipeline by traversing from the first defined Workstation
+     *
+     * @param pipelineCallback    An instance(s) reference to the IPipelineResult or/and IPipelineProgress concrete implementation
+     * @param pipelineRequestCode An unique request code belong to this pipeline
+     */
+    public void runAsync(IPipelineCallback pipelineCallback, Integer pipelineRequestCode,long delayMillis) {
+        prepareAsync(pipelineCallback, pipelineRequestCode,delayMillis);
+
+        if (IsRoot) {
+            try {
+                invoke(pipelineData);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            _prevWorkStation.runAsync(pipelineCallback, pipelineRequestCode,delayMillis);
+        }
+    }
+
+    public void prepareAsync(IPipelineCallback pipelineCallback, Integer pipelineRequestCode,long delayMillis) {
+        this.pipelineRequestCode = pipelineRequestCode;
+        this.pipelineCallback = pipelineCallback;
+        this.pipelineResult = (IPipelineResult) pipelineCallback;
+        this.delayMillis = delayMillis;
+
+        try {
+            this.iPipelineProgress = (IPipelineProgress) pipelineCallback;
+        } catch (ClassCastException e) {
+            //ignore
         }
     }
 

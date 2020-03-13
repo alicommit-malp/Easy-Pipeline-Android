@@ -1,39 +1,24 @@
 package com.appelinda.easypipeline;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class Pipeline extends WorkStation {
-
-    private IPipelineResult pipelineResult;
 
 
     /**
      * Will instantiate a new Pipeline
      */
     public Pipeline(IPipelineData pipelineData) {
-        this.pipelineData=pipelineData;
+        this.pipelineData = pipelineData;
         IsRoot = true;
     }
 
-
     /**
      * Will instantiate a new Pipeline
-     *
-     * @param pipelineCallback    An instance(s) reference to the IPipelineResult or/and IPipelineProgress concrete implementation
-     * @param pipelineRequestCode An unique request code belong to this pipeline
      */
-    public Pipeline(IPipelineData pipelineData,IPipelineCallback pipelineCallback, Integer pipelineRequestCode) {
+    public Pipeline() {
         IsRoot = true;
-        this.pipelineRequestCode = pipelineRequestCode;
-        this.pipelineCallback = pipelineCallback;
-        this.pipelineResult = (IPipelineResult) pipelineCallback;
-        this.pipelineData = pipelineData;
-
-        try {
-            this.iPipelineProgress = (IPipelineProgress) pipelineCallback;
-        } catch (ClassCastException e) {
-            //ignore
-        }
     }
 
     protected void invoke(IPipelineData pipelineData) throws Exception {
@@ -42,8 +27,8 @@ public class Pipeline extends WorkStation {
             new PipelineWorker().execute(this);
     }
 
-    private void _invoke(IPipelineData iPipelineData) throws Exception {
-        super.invoke(iPipelineData);
+    private void _invoke(IPipelineData pipelineData) throws Exception {
+        super.invoke(pipelineData);
     }
 
     static class PipelineWorker extends AsyncTask<Pipeline, Void, Pipeline> {
@@ -53,6 +38,7 @@ public class Pipeline extends WorkStation {
         protected Pipeline doInBackground(Pipeline... pipelines) {
             pipelineResult = new PipelineResult(pipelines[0].pipelineRequestCode);
             try {
+                Thread.sleep(pipelines[0].delayMillis);
                 pipelines[0]._invoke(pipelines[0].pipelineData);
             } catch (Exception e) {
                 pipelineResult.setException(e);

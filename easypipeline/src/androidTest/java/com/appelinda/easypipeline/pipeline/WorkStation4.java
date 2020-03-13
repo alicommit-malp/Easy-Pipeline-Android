@@ -9,11 +9,12 @@ public class WorkStation4 extends WorkStation {
     @Override
     protected void invoke(IPipelineData data) throws Exception {
 
-        PipelineData pipelineData = (PipelineData) data;
+        if (data != null) {
+            PipelineData pipelineData = (PipelineData) data;
+            pipelineData.AddResult(WorkStation4.class.getName());
+        }
 
         Thread.sleep(1000);
-        pipelineData.AddResult(WorkStation4.class.getName());
-
         super.invoke(data);
     }
 }

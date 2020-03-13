@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PipelineData implements IPipelineData {
-    private List<String> result= new ArrayList<>();
+    private List<String> result;
 
     public List<String> getResult() {
         return result;
     }
 
     public void AddResult(String value) {
+        if(result==null) result = new ArrayList<>();
         result.add(value);
     }
 
