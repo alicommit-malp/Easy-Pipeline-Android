@@ -1,13 +1,14 @@
 package com.appelinda.easypipeline;
 
 import android.os.AsyncTask;
-import android.util.Log;
+
+import com.appelinda.easypipeline.data.PipelineResult;
+import com.appelinda.easypipeline.interfaces.IPipelineData;
 
 public class Pipeline extends WorkStation {
 
-
     /**
-     * Will instantiate a new Pipeline
+     * Will instantiate a new Pipeline with the pipeline data
      */
     public Pipeline(IPipelineData pipelineData) {
         this.pipelineData = pipelineData;
@@ -15,7 +16,7 @@ public class Pipeline extends WorkStation {
     }
 
     /**
-     * Will instantiate a new Pipeline
+     * Will instantiate a new Pipeline with out any pipeline data
      */
     public Pipeline() {
         IsRoot = true;
@@ -31,6 +32,9 @@ public class Pipeline extends WorkStation {
         super.invoke(pipelineData);
     }
 
+    /**
+     * The Worker thread which will run the pipeline logic in Asynchronous mode
+     */
     static class PipelineWorker extends AsyncTask<Pipeline, Void, Pipeline> {
         PipelineResult pipelineResult;
 

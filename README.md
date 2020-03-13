@@ -19,12 +19,12 @@ will take care of the above example as easy as the following code
 
 ```java
 
-new Pipeline(this,ReqCode,this)
+new Pipeline(pipelineData)
         .Next(new Call_API_A(),25F)
         .Next(new Save_To_Local_DB(),50F)
         .Next(new Notify_The_UI(),75F)
         .Next(new Send_Statistics(),100F)
-        .Run(pipelineData);
+        .RunAsync(this,RequestCode);
 
 
 ```
@@ -50,13 +50,13 @@ A step in a pipeline, in the above example Call_API_A() is a workstation
 public class Call_API_A extends WorkStation {
 
     @Override
-    protected void InvokeAsync(IPipelineData data) throws Exception {
+    protected void invoke(IPipelineData data) throws Exception {
 
         PipelineData pipelineData = (PipelineData) data;
 
         //do the work
 
-        super.InvokeAsync(data);
+        super.invoke(data);
     }
 }
 
@@ -68,63 +68,73 @@ therefore for each step or workstation you will create a class which must inheri
 
 is an integer which you need to provide the pipeline with, to be able to handle the pipeline's tasks asynchronous, therefore when the pipeline finishes its work ,means that the last workstation has finished its work then the pipeline will call its callback with its request code , therefore you can have multiple pipelines in one class.
 
-## Complete code
+You can use it synchronously like this
 
 ```java
 
-@RunWith(AndroidJUnit4.class)
-public class PipelineTest implements IPipelineResult, IPipelineProgress {
+@Test
+public void SyncTest() throws Exception {
 
-    PipelineData pipelineData;
-    public static final int ReqCode = 1;
-    private CountDownLatch lock = new CountDownLatch(1);
-    PipelineData pipelineResult;
+    pipelineData = new PipelineData();
 
+    PipelineData result = (PipelineData) new Pipeline(pipelineData)
+            .next(new WorkStation1())
+            .next(new WorkStation2())
+            .next(new WorkStation3())
+            .next(new WorkStation4())
+            .runOnUiThread();
 
-    @Test
-    public void useAppContext() throws InterruptedException {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-
-        pipelineData = new PipelineData();
-
-        new Pipeline(this, ReqCode, this)
-                .Next(new WorkStation1(), 20F, 11)
-                .Next(new WorkStation2())
-                .Next(new WorkStation3(), 12)
-                .Next(new WorkStation4(), 100F)
-                .Run(pipelineData);
-
-        lock.await();
-
-        Assert.assertEquals(pipelineData,pipelineResult);
-    }
-
-    @Override
-    public void OnResult(PipelineResult result) {
-        if (result.isSuccess()) {
-            switch (result.getRequestCode()) {
-                case ReqCode:
-                    Log.d("REQ-" + ReqCode, result.getPipelineData().toString());
-                    pipelineResult = (PipelineData) result.getPipelineData();
-                    break;
-            }
-        }else {
-           result.getException().printStackTrace();
-        }
-
-        lock.countDown();
-    }
-
-
-    @Override
-    public void OnProgress(Integer sourcePipelineHashCode, Integer workStationRequestCode, Float progress) {
-        Log.d("REQ-" + sourcePipelineHashCode, " WorkStationReqCode: " + workStationRequestCode + " progress: " + progress);
-    }
+    Assert.assertEquals(result.getResult().size(), 4);
 }
 
 
+
 ```
+
+or Asynchronously like this
+
+```java
+
+@Test
+public void AsyncTest() throws InterruptedException {
+
+    pipelineData = new PipelineData();
+
+    new Pipeline(pipelineData)
+            .next(new WorkStation1(), /*progress=*/ 20F, /*requestCode=*/ 11)
+            .next(new WorkStation2())
+            .next(new WorkStation3(), /*progress=*/ 12F)
+            .next(new WorkStation4(), /*progress=*/ 100F)
+            .runAsync(this, ReqCode);
+
+    countDownLatch.await();
+
+    Assert.assertEquals(((PipelineData) (pipelineResult.getPipelineData())).getResult().size(), 4);
+    Assert.assertEquals(pipelineResult.getRequestCode(), ReqCode);
+    Assert.assertEquals(pipelineResult.isSuccess(), true);
+}
+
+@Override
+public void OnResult(PipelineResult result) {
+    if (result.isSuccess()) {
+        Log.d("REQ-" + ReqCode, String.valueOf(result.getPipelineData()));
+    } else {
+        result.getException().printStackTrace();
+    }
+
+    pipelineResult = result;
+    countDownLatch.countDown();
+}
+
+
+@Override
+public void OnProgress(Integer sourcePipelineHashCode, Integer workStationRequestCode, Float progress) {
+    Log.d("REQ-" + sourcePipelineHashCode, " WorkStationReqCode: " + workStationRequestCode + " progress: " + progress);
+}
+
+```
+
+you can find [here]("https://github.com/alicommit-malp/Easy-Pipeline-Android/blob/master/easypipeline/src/androidTest/java/com/appelinda/easypipeline/PipelineTest.java") the rest of the test cases
 
 Happy coding :)
 

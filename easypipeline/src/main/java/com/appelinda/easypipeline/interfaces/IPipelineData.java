@@ -1,4 +1,4 @@
-package com.appelinda.easypipeline;
+package com.appelinda.easypipeline.interfaces;
 
 /**
  * The interface which must be implemented for the pipeline's data

@@ -4,6 +4,10 @@ import android.util.Log;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.appelinda.easypipeline.data.PipelineResult;
+import com.appelinda.easypipeline.interfaces.IPipelineData;
+import com.appelinda.easypipeline.interfaces.IPipelineProgress;
+import com.appelinda.easypipeline.interfaces.IPipelineResult;
 import com.appelinda.easypipeline.pipeline.PipelineData;
 import com.appelinda.easypipeline.pipeline.WorkStation1;
 import com.appelinda.easypipeline.pipeline.WorkStation2;

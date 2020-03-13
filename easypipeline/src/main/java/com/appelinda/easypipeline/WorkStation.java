@@ -1,5 +1,10 @@
 package com.appelinda.easypipeline;
 
+import com.appelinda.easypipeline.interfaces.IPipelineCallback;
+import com.appelinda.easypipeline.interfaces.IPipelineData;
+import com.appelinda.easypipeline.interfaces.IPipelineProgress;
+import com.appelinda.easypipeline.interfaces.IPipelineResult;
+
 /**
  * @author Ali Alp
  * @see <a href="https://dev.to/alialp/asynchronous-easy-pipeline-in-android-h7p">Easy-Pipeline on Dev.to</a>
@@ -10,7 +15,6 @@ public abstract class WorkStation {
 
     WorkStation _nextWorkStation;
     WorkStation _prevWorkStation;
-    boolean IsRoot;
     IPipelineProgress iPipelineProgress;
     Integer pipelineRequestCode = null;
     Integer workStationRequestCode = null;
@@ -18,6 +22,7 @@ public abstract class WorkStation {
     IPipelineCallback pipelineCallback;
     IPipelineData pipelineData;
     IPipelineResult pipelineResult;
+    boolean IsRoot;
     long delayMillis=0;
     boolean runOnUiThread = false;
 
@@ -149,6 +154,7 @@ public abstract class WorkStation {
      *
      * @param pipelineCallback    An instance(s) reference to the IPipelineResult or/and IPipelineProgress concrete implementation
      * @param pipelineRequestCode An unique request code belong to this pipeline
+     * @param delayMillis is the amount of milliseconds which the pipeline will began afterwards
      */
     public void runAsync(IPipelineCallback pipelineCallback, Integer pipelineRequestCode,long delayMillis) {
         prepareAsync(pipelineCallback, pipelineRequestCode,delayMillis);

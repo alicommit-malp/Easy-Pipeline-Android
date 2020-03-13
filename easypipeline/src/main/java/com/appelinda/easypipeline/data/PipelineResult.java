@@ -1,4 +1,6 @@
-package com.appelinda.easypipeline;
+package com.appelinda.easypipeline.data;
+
+import com.appelinda.easypipeline.interfaces.IPipelineData;
 
 public class PipelineResult {
     private Integer requestCode;
@@ -18,7 +20,7 @@ public class PipelineResult {
         return pipelineData;
     }
 
-    void setPipelineData(IPipelineData pipelineData) {
+    public void setPipelineData(IPipelineData pipelineData) {
         this.pipelineData = pipelineData;
     }
 
@@ -30,7 +32,7 @@ public class PipelineResult {
         return exception;
     }
 
-    void setException(Exception exception) {
+    public void setException(Exception exception) {
         this.success =false;
         this.exception = exception;
     }

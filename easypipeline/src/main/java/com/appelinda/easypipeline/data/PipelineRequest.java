@@ -1,4 +1,8 @@
-package com.appelinda.easypipeline;
+package com.appelinda.easypipeline.data;
+
+import com.appelinda.easypipeline.interfaces.IPipelineData;
+import com.appelinda.easypipeline.interfaces.IPipelineProgress;
+import com.appelinda.easypipeline.interfaces.IPipelineResult;
 
 class PipelineRequest {
     private IPipelineData pipelineData;

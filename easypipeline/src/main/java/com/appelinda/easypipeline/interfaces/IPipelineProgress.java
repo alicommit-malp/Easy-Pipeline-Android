@@ -1,4 +1,4 @@
-package com.appelinda.easypipeline;
+package com.appelinda.easypipeline.interfaces;
 
 /**
  * Pipeline's callback for notifying the caller on progress of the pipeline (end of each WorkStation)

@@ -1,7 +1,7 @@
 package com.appelinda.easypipeline.pipeline;
 
 
-import com.appelinda.easypipeline.IPipelineData;
+import com.appelinda.easypipeline.interfaces.IPipelineData;
 
 import java.util.ArrayList;
 import java.util.List;

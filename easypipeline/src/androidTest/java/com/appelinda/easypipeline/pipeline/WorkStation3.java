@@ -1,7 +1,7 @@
 package com.appelinda.easypipeline.pipeline;
 
 
-import com.appelinda.easypipeline.IPipelineData;
+import com.appelinda.easypipeline.interfaces.IPipelineData;
 import com.appelinda.easypipeline.WorkStation;
 
 public class WorkStation3 extends WorkStation {
