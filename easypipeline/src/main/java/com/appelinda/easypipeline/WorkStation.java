@@ -15,6 +15,8 @@ public abstract class WorkStation {
     Integer pipelineRequestCode = null;
     Integer workStationRequestCode = null;
     Float progressValue = null;
+    IPipelineCallback pipelineCallback;
+    IPipelineData pipelineData;
     boolean runOnUiThread = false;
 
     /**
@@ -78,6 +80,7 @@ public abstract class WorkStation {
         _nextWorkStation._prevWorkStation = this;
         _nextWorkStation.iPipelineProgress = iPipelineProgress;
         _nextWorkStation.pipelineRequestCode = pipelineRequestCode;
+        _nextWorkStation.pipelineData = pipelineData;
 
         return _nextWorkStation;
     }
@@ -85,34 +88,30 @@ public abstract class WorkStation {
     /**
      * Asynchronously, Begin the Pipeline by traversing from the first defined Workstation
      *
-     * @param data an instance of a concrete implementation of the IPipelineData class
      */
-    public void runAsync(IPipelineData data) {
+    public void runAsync() {
         if (IsRoot) {
             try {
-                invoke(data);
+                invoke(pipelineData);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            _prevWorkStation.runAsync(data);
+            _prevWorkStation.runAsync();
         }
     }
 
     /**
      * Synchronously, Begin the Pipeline by traversing from the first defined Workstation
-     *
-     * @param data an instance of a concrete implementation of the IPipelineData class
      */
-    public IPipelineData runOnUiThread(IPipelineData data) throws Exception {
+    public IPipelineData runOnUiThread() throws Exception {
         this.runOnUiThread = true;
         if (IsRoot) {
-            invoke(data);
+            invoke(pipelineData);
         } else {
-            _prevWorkStation.runOnUiThread(data);
+            _prevWorkStation.runOnUiThread();
         }
-
-        return data;
+        return pipelineData;
     }
 
     void updateProgress() {

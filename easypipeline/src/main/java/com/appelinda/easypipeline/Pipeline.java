@@ -4,15 +4,14 @@ import android.os.AsyncTask;
 
 public class Pipeline extends WorkStation {
 
-    private IPipelineCallback pipelineCallback;
-    private IPipelineData pipelineData;
     private IPipelineResult pipelineResult;
 
 
     /**
      * Will instantiate a new Pipeline
      */
-    public Pipeline() {
+    public Pipeline(IPipelineData pipelineData) {
+        this.pipelineData=pipelineData;
         IsRoot = true;
     }
 
@@ -23,11 +22,12 @@ public class Pipeline extends WorkStation {
      * @param pipelineCallback    An instance(s) reference to the IPipelineResult or/and IPipelineProgress concrete implementation
      * @param pipelineRequestCode An unique request code belong to this pipeline
      */
-    public Pipeline(IPipelineCallback pipelineCallback, Integer pipelineRequestCode) {
+    public Pipeline(IPipelineData pipelineData,IPipelineCallback pipelineCallback, Integer pipelineRequestCode) {
         IsRoot = true;
         this.pipelineRequestCode = pipelineRequestCode;
         this.pipelineCallback = pipelineCallback;
         this.pipelineResult = (IPipelineResult) pipelineCallback;
+        this.pipelineData = pipelineData;
 
         try {
             this.iPipelineProgress = (IPipelineProgress) pipelineCallback;
@@ -37,7 +37,6 @@ public class Pipeline extends WorkStation {
     }
 
     protected void invoke(IPipelineData pipelineData) throws Exception {
-        this.pipelineData = pipelineData;
         if (runOnUiThread) _invoke(pipelineData);
         else
             new PipelineWorker().execute(this);

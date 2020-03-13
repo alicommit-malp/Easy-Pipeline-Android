@@ -34,12 +34,12 @@ public class PipelineTest implements IPipelineResult ,IPipelineProgress{
 
         pipelineData = new PipelineData();
 
-        PipelineData result = (PipelineData) new Pipeline()
+        PipelineData result = (PipelineData) new Pipeline(pipelineData)
                 .next(new WorkStation1(), 20F, 11)
                 .next(new WorkStation2())
                 .next(new WorkStation3(), 12)
                 .next(new WorkStation4(), 100F)
-                .runOnUiThread(pipelineData);
+                .runOnUiThread();
 
         Assert.assertEquals(pipelineData, result);
     }
@@ -49,12 +49,12 @@ public class PipelineTest implements IPipelineResult ,IPipelineProgress{
 
         pipelineData = new PipelineData();
 
-        new Pipeline(this,ReqCode)
+        new Pipeline(pipelineData,this,ReqCode)
                 .next(new WorkStation1(), 20F, 11)
                 .next(new WorkStation2())
                 .next(new WorkStation3(), 12)
                 .next(new WorkStation4(), 100F)
-                .runAsync(pipelineData);
+                .runAsync();
 
         countDownLatch.await();
 
