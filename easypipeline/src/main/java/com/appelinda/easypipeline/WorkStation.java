@@ -185,6 +185,8 @@ public abstract class WorkStation {
 
     /**
      * Synchronously, Begin the Pipeline by traversing from the first defined Workstation
+     * @throws Exception in case the invoke throw
+     * @return will return the result of the pipeline in synchronous mode
      */
     public IPipelineData runOnUiThread() throws Exception {
         this.runOnUiThread = true;

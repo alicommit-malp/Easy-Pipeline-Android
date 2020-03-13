@@ -9,6 +9,7 @@ public class Pipeline extends WorkStation {
 
     /**
      * Will instantiate a new Pipeline with the pipeline data
+     * @param pipelineData set the pipeline data which will travel through all the workstations
      */
     public Pipeline(IPipelineData pipelineData) {
         this.pipelineData = pipelineData;
